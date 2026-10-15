@@ -1,0 +1,7 @@
+name: reinforcement-learning
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - python=3.12
+
