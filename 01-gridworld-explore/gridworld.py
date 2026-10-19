@@ -4,6 +4,7 @@ import mdp
 import environment
 import util
 import optparse
+import statistics
 
 from gridworldClass import Gridworld
 
@@ -105,6 +106,7 @@ def getUserAction(state, actionFunction):
 # Exercise 1: Implement "return" computation
 def runEpisode(agent, environment, discount, decision, display, message, pause, episode):
   returns = 0
+  iteration = 0
   environment.reset()
   message("BEGINNING EPISODE: "+str(episode)+"\n")
   while True:
@@ -118,7 +120,7 @@ def runEpisode(agent, environment, discount, decision, display, message, pause, 
     actions = environment.getPossibleActions(state)
     if len(actions) == 0:
       message("EPISODE "+str(episode)+" COMPLETE: RETURN WAS "+str(returns)+"\n")
-      return 0  # TODO: IMPLEMENT "return" obtained in the episode
+      return returns
 
     # GET ACTION (USUALLY FROM AGENT)
     action = decision(state)
@@ -135,7 +137,8 @@ def runEpisode(agent, environment, discount, decision, display, message, pause, 
     # UPDATE LEARNER
     agent.update(state, action, nextState, reward)
 
-    # TODO: make sure you compute the returns
+    returns += opts.discount ** iteration * reward
+    iteration += 1
 
 
 
@@ -286,10 +289,13 @@ if __name__ == '__main__':
   # Exercise 1: implement the mean and std of the value estimation for the start state and print it out
   #  check what runEpisode returns
 
+  all_returns = []
   for episode in range(1, opts.episodes+1):
-    runEpisode(a, env, opts.discount, decisionCallback, displayCallback, messageCallback, pauseCallback, episode)
+    returns = runEpisode(a, env, opts.discount, decisionCallback, displayCallback, messageCallback, pauseCallback, episode)
+    all_returns.append(returns)
   if opts.episodes > 0:
-    # print here
-    pass
+    print(f"---------- RAN A TOTAL OF {opts.episodes} EPISODE(S)")
+    print(f"RETURN MEAN: {statistics.mean(all_returns)}")
+    print(f"RETURN STD: {statistics.stdev(all_returns)}")
 
   print()
