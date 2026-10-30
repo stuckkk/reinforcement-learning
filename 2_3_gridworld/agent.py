@@ -140,6 +140,106 @@ class ValueIterationAgent(Agent):
     pass
 
 
+class PolicyIterationAgent(Agent):
+  def __init__(self, mdp, discount = 0.9, iterations = 100):
+    """
+    Your value iteration agent should take an mdp on
+    construction, run the indicated number of iterations
+    and then act according to the resulting policy.
+    """
+    self.mdp = mdp
+    self.discount = discount
+    self.iterations = iterations
+    self.policy = {}
+
+    # Initialize policy with any action
+    for state in self.mdp.getStates():
+      actions = self.mdp.getPossibleActions(state)
+      if actions:
+        self.policy[state] = actions[0]
+
+
+    self.value_function = util.Counter()
+
+    for i in range(self.iterations):
+      if not -1e-10 < self.value_function.getCount(self.mdp.getStartState()) < 1e-10:
+        print(f"Start state value function non-zero at iteration {i}")
+      # Policy evaluation
+      for _ in range(self.iterations):
+        for state in self.mdp.getStates():
+          # Do not change the value function if no action is available
+          if self.mdp.getPossibleActions(state):
+            action = self.getAction(state)
+            expected_future_reward = self.discount * sum([prob * self.getValue(next_state) for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)])
+            self.value_function[state] = self.mdp.getReward(state, action, None) + expected_future_reward
+
+      # Policy iteration
+      policy_stable = True
+      for state in self.mdp.getStates():
+        best_action = None
+        best_reward = 0
+        for action in self.mdp.getPossibleActions(state):
+          expected_future_reward = self.discount * sum([prob * self.getValue(next_state) for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)])
+          immediate_reward = self.mdp.getReward(state, action, None)
+          reward = immediate_reward + expected_future_reward
+          if not best_action or reward > best_reward:
+            best_action = action
+            best_reward = reward
+
+        # Policy changed if there are actions available and new argmax differs from old argmax
+        if best_action and best_action != self.getAction(state):
+          policy_stable = False
+        
+        self.policy[state] = best_action
+
+      # Terminate if policy is stable
+      if policy_stable:
+        print(f"Stable policy after {i} iterations")
+        break
+        
+
+  def getValue(self, state):
+    """
+    Look up the value of the state (after the indicated
+    number of value iteration passes).
+    """
+    return self.value_function.getCount(state)
+
+
+  def getQValue(self, state, action):
+    """
+    Look up the q-value of the state action pair
+    (after the indicated number of value iteration
+    passes).  Note that value iteration does not
+    necessarily create this quantity and you may have
+    to derive it on the fly.
+    """
+    return self.mdp.getReward(state, action, None) + self.discount * sum([prob * self.getValue(next_state) for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)])
+
+
+  def getPolicy(self, state):
+    """
+    Look up the policy's recommendation for the state
+    (after the indicated number of value iteration passes).
+    """
+    return self.policy[state]
+    
+
+  def getAction(self, state):
+    """
+    Return the action recommended by the policy.
+    """
+    return self.getPolicy(state)
+
+
+  def update(self, state, action, nextState, reward):
+    """
+    Not used for policy iteration agents!
+    """
+
+    pass
+
+
 ################################################################################
 # Below can be ignored for Exercise 2
 

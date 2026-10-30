@@ -246,6 +246,8 @@ if __name__ == '__main__':
   a = None
   if opts.agent == 'value':
     a = agent.ValueIterationAgent(mdp, opts.discount, opts.iters)
+  elif opts.agent == 'policy':
+    a = agent.PolicyIterationAgent(mdp, opts.discount, opts.iters)
   elif opts.agent == 'q':
     a = agent.QLearningAgent(env.getPossibleActions, opts.discount, opts.learningRate, opts.epsilon)
   elif opts.agent == 'random':
@@ -261,7 +263,7 @@ if __name__ == '__main__':
   ###########################
 
   # DISPLAY Q/V VALUES BEFORE SIMULATION OF EPISODES
-  if opts.agent == 'value':
+  if opts.agent in ('value', 'policy'):
     display.displayValues(a, message = "VALUES AFTER "+str(opts.iters)+" ITERATIONS")
     display.pause()
     display.displayQValues(a, message = "Q-VALUES AFTER "+str(opts.iters)+" ITERATIONS")
@@ -271,7 +273,7 @@ if __name__ == '__main__':
   displayCallback = lambda x: None
   if not opts.quiet:
     if opts.agent == 'random': displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
-    if opts.agent == 'value': displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
+    if opts.agent in ('value', 'policy'): displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
     if opts.agent == 'q': displayCallback = lambda state: display.displayQValues(a, state, "CURRENT Q-VALUES")
 
   messageCallback = lambda x: printString(x)
