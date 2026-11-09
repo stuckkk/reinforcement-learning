@@ -207,8 +207,13 @@ class QLearningAgent(Agent):
     """
     Look up the current recommendation for the state.
     """
-    return self.getAction(state)
+    if not self.actionFunction(state):
+      return None
+    
+    state_value = self.getValue(state)
 
+    possible_actions = [action for action in self.actionFunction(state) if self.q_function.getCount((state, action)) == state_value]
+    return random.choice(possible_actions)
 
 
   def getAction(self, state):
@@ -222,10 +227,7 @@ class QLearningAgent(Agent):
     if random.random() < self.epsilon:
       return random.choice(self.actionFunction(state))
 
-    state_value = self.getValue(state)
-    possible_actions = [action for action in self.actionFunction(state) if self.q_function.getCount((state, action)) == state_value]
-
-    return random.choice(possible_actions)
+    return self.getPolicy(state)
       
 
 
