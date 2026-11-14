@@ -230,8 +230,6 @@ class QLearningAgent(Agent):
     return self.getPolicy(state)
       
 
-
-
   def update(self, state, action, nextState, reward):
     """
     Update parameters in response to the observed transition.

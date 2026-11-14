@@ -2,7 +2,15 @@ name: reinforcement-learning
 channels:
   - conda-forge
 dependencies:
-  - pip
-  - numpy
   - python=3.12
-
+  - numpy
+  - matplotlib
+  - box2d-py
+  - swig
+  - pygame
+  - gymnasium
+  - tensorboardx
+  - notebook
+  - jupyterlab
+  - ipympl
+  - pytorch-cpu
